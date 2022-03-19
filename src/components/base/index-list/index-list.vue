@@ -1,0 +1,60 @@
+<template>
+  <div class="index-list">
+    <ul>
+      <li v-for="group in singers" :key="group.title" class="group">
+        <h2 class="title">{{group.title}}</h2>
+        <ul>
+          <li v-for="item in group.list" :key="item.id" class="item">
+            <img width="50" height="50" v-lazy="item.pic" class="avatar">
+            <span class="name">{{item.name}}</span>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</template>
+<script>
+export default {
+  name: 'index-list',
+  props: {
+    singers: {
+      type: Array,
+      default: () => []
+    }
+  },
+  setup() {
+
+  }
+}
+</script>
+<style lang="scss" scoped>
+  .index-list{
+     background: $color-background;
+     .group{
+       padding-bottom: 30px;
+       .title{
+         height: 30px;
+         line-height: 30px;
+         padding-left: 20px;
+         font-size: $font-size-small;
+         color: $color-text-l;
+         background: $color-highlight-background;
+       }
+       .item{
+         display: flex;
+         align-items: center;
+         padding:20px 0 0 30px;
+         .avatar {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+        }
+        .name {
+          margin-left: 20px;
+          color: $color-text-l;
+          font-size: $font-size-medium;
+        }
+       }
+     }
+  }
+</style>

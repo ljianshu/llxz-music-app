@@ -1,13 +1,26 @@
 <template>
   <div class="singer">
-    singer
+    <index-list :singers="singers"></index-list>
   </div>
 </template>
 
 <script>
-
+import { getSingerList } from '@/service/singer'
+ import IndexList from '@/components/base/index-list/index-list'
 export default {
-  name: 'Singer'
-
+  name: 'Singer',
+  components: {
+    IndexList
+  },
+  data() {
+    return {
+      singers: []
+    }
+  },
+  async created() {
+    const result = await getSingerList()
+    this.singers = result.singers
+    console.log(111, result)
+  }
 }
 </script>
