@@ -20,7 +20,6 @@ export default {
   async created() {
     const result = await getSingerList()
     this.singers = result.singers
-    console.log(111, result)
   }
 }
 </script>
