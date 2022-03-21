@@ -1,6 +1,12 @@
 <template>
   <div class="singer" v-loading="!singers.length">
-    <index-list :singers="singers"></index-list>
+    <index-list :singers="singers" @select="selectSinger"></index-list>
+    <router-view :singer="selectedSinger"></router-view>
+    <!-- <router-view v-slot="{ Component }">
+      <transition appear name="slide">
+        <component :is="Component" :data="selectedSinger"/>
+      </transition>
+    </router-view> -->
   </div>
 </template>
 
@@ -14,12 +20,21 @@ export default {
   },
   data() {
     return {
-      singers: []
+      singers: [],
+      selectedSinger: null
     }
   },
   async created() {
     const result = await getSingerList()
     this.singers = result.singers
+  },
+  methods: {
+    selectSinger(singer) {
+      this.selectedSinger = singer
+      this.$router.push({
+        path: `/singer/${singer && singer.mid}`
+      })
+    }
   }
 }
 </script>

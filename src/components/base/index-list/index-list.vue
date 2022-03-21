@@ -4,7 +4,7 @@
       <li v-for="group in singers" :key="group.title" class="group">
         <h2 class="title">{{group.title}}</h2>
         <ul>
-          <li v-for="item in group.list" :key="item.id" class="item">
+          <li v-for="item in group.list" :key="item.id" class="item" @click="onItemClick(item)">
             <img width="50" height="50" v-lazy="item.pic" class="avatar">
             <span class="name">{{item.name}}</span>
           </li>
@@ -23,17 +23,23 @@ import Scroll from '../scroll/scroll.vue'
 export default {
   name: 'index-list',
   components: { Scroll },
+  emit: ['select'],
   props: {
     singers: {
       type: Array,
       default: () => []
     }
   },
-  setup(props) {
+  setup(props, { emit }) {
+    const onItemClick = (item) => {
+      console.log('item', item)
+      emit('select', item)
+    }
     const { groupRef, onScroll } = useFixed(props)
     return {
       groupRef,
-      onScroll
+      onScroll,
+      onItemClick
     }
   }
 }
