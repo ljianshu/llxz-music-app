@@ -1,12 +1,12 @@
 <template>
-  <div class="singer">
+  <div class="singer" v-loading="!singers.length">
     <index-list :singers="singers"></index-list>
   </div>
 </template>
 
 <script>
 import { getSingerList } from '@/service/singer'
- import IndexList from '@/components/base/index-list/index-list'
+import IndexList from '@/components/base/index-list/index-list'
 export default {
   name: 'Singer',
   components: {
@@ -23,3 +23,11 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+  .singer{
+    position: fixed;
+    top: 88px;
+    bottom: 0;
+    width: 100%;
+  }
+</style>
