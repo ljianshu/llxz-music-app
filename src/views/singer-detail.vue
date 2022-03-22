@@ -23,7 +23,7 @@ export default {
       return this.singer && this.singer.pic
     },
     title() {
-      return this.singer && this.singer.title
+      return this.singer && this.singer.name
     }
   },
   data() {
@@ -33,18 +33,14 @@ export default {
   },
   async created() {
     const result = await getSingerDetail(this.singer)
-    const songs = await processSongs(result.songs)
-    console.log('singer', this.singer)
-    console.log('songs', songs)
-  },
-  methods: {
+    this.songs = await processSongs(result.songs)
   }
 }
 </script>
 <style lang='scss' scoped>
  .singer-detail {
     position: fixed;
-    z-index: 10;
+    z-index: 50;
     top: 0;
     left: 0;
     bottom: 0;

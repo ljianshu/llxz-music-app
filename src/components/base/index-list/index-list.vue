@@ -32,7 +32,6 @@ export default {
   },
   setup(props, { emit }) {
     const onItemClick = (item) => {
-      console.log('item', item)
       emit('select', item)
     }
     const { groupRef, onScroll } = useFixed(props)

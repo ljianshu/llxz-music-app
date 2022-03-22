@@ -6,12 +6,12 @@
     <h1 class="title">{{title}}</h1>
     <div class="bg-img" :style="bgImgStyle"></div>
     <div class="filter"></div>
+    <scroll class="list" v-loading="loading">
+      <div class="song-list-wrapper">
+        <song-list :songs="songs"></song-list>
+      </div>
+    </scroll>
   </div>
-  <scroll class="list">
-    <div class="song-list-wrapper">
-      <song-list :songs="songs"></song-list>
-    </div>
-  </scroll>
 </template>
 <script>
 import Scroll from '@/components/base/scroll/scroll'
@@ -27,14 +27,15 @@ export default {
       type: Array,
       default: () => []
     },
-    title: String,
-    pic: String
+    pic: {
+      type: String,
+      default: ''
+    },
+    title: String
   },
   computed: {
     bgImgStyle() {
-      return {
-        backgroundImage: `url(${this.pic})`
-      }
+       return `background-image: url(${this.pic})`
     }
   }
 }
@@ -69,7 +70,7 @@ export default {
       font-size: $font-size-large;
       color: $color-text;
     }
-    .bg-image {
+    .bg-img {
       position: relative;
       width: 100%;
       height: 0;
