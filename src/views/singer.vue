@@ -32,7 +32,7 @@ export default {
     selectSinger(singer) {
       this.selectedSinger = singer
       this.$router.push({
-        path: `/singer/${singer && singer.mid}`
+        path: `/singer/${singer.mid}`
       })
     }
   }

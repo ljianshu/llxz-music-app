@@ -34,6 +34,7 @@ export default {
   async created() {
     const result = await getSingerDetail(this.singer)
     const songs = await processSongs(result.songs)
+    console.log('singer', this.singer)
     console.log('songs', songs)
   },
   methods: {

@@ -12,9 +12,9 @@
       </li>
     </ul>
     <!-- 固定层 -->
-    <div class="fixed" v-show="fixedTitle" :style="fixedTitle">
+    <!-- <div class="fixed" v-show="fixedTitle" :style="fixedTitle">
       <div class="fixed-title">{{fixedTitle}}</div>
-    </div>
+    </div> -->
   </Scroll>
 </template>
 <script>
