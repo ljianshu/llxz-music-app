@@ -7,6 +7,8 @@
 import MusicList from '@/components/music-list/music-list'
 import { getSingerDetail } from '@/service/singer'
 import { processSongs } from '@/service/song'
+import storage from 'good-storage'
+import { SINGER_KEY } from '@/assets/js/constant'
 export default {
   name: 'SingerDetail',
   components: {
@@ -19,11 +21,28 @@ export default {
     }
   },
   computed: {
+    computedSinger() {
+      let ret = null
+      const singer = this.singer
+      if (singer) {
+        // 从歌手列表进入
+        ret = singer
+      } else {
+        // 刷新歌手详情页时
+        const cachedSinger = storage.session.get(SINGER_KEY)
+        if (cachedSinger && this.$route.params.id === cachedSinger.mid) {
+          ret = cachedSinger
+        }
+      }
+      return ret
+    },
     pic() {
-      return this.singer && this.singer.pic
+      const singer = this.computedSinger
+      return singer && singer.pic
     },
     title() {
-      return this.singer && this.singer.name
+      const singer = this.computedSinger
+      return singer && singer.name
     }
   },
   data() {
@@ -32,7 +51,16 @@ export default {
     }
   },
   async created() {
-    const result = await getSingerDetail(this.singer)
+    // computedSinger有可能取到null,比如手动修改网页地址，然后刷新页面，就会报错
+    const data = this.computedSinger
+    if (!data) {
+      const path = this.$route.matched[0].path
+      this.$router.push({
+        path
+      })
+      return
+    }
+    const result = await getSingerDetail(data)
     this.songs = await processSongs(result.songs)
   }
 }
