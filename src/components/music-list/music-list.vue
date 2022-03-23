@@ -1,12 +1,13 @@
 <template>
   <div class="music-list">
-    <div class="back">
+    <div class="back" @click="goBack">
       <i class="icon-back"></i>
     </div>
     <h1 class="title">{{title}}</h1>
-    <div class="bg-img" :style="bgImgStyle"></div>
+    <div class="bg-img" :style="bgImgStyle" ref="bgImg"></div>
     <div class="filter"></div>
-    <scroll class="list" v-loading="loading">
+    <scroll class="list" v-loading="loading" :style="listStyle" :probe-type="3"
+      @scroll="onScroll">
       <div class="song-list-wrapper">
         <song-list :songs="songs"></song-list>
       </div>
@@ -16,6 +17,9 @@
 <script>
 import Scroll from '@/components/base/scroll/scroll'
 import SongList from '@/components/base/song-list/song-list'
+
+const RESERVED_HEIGHT = 40
+
 export default {
   name: 'music-list',
   components: {
@@ -33,9 +37,56 @@ export default {
     },
     title: String
   },
+  data() {
+    return {
+      bgImgHeigth: 0,
+      scrollY: 0,
+      maxTranslateY: 0
+    }
+  },
   computed: {
     bgImgStyle() {
-       return `background-image: url(${this.pic})`
+        let zIndex = 0
+        let paddingTop = '70%'
+        let height = 0
+        // 为了处理IOS兼容性问题
+        let translateZ = 0
+        if (this.scrollY > this.maxTranslateY) {
+          // 当歌单滚动距离大于最大可滚动距离时，页面头部就固定住
+          zIndex = 10
+          height = `${RESERVED_HEIGHT}px`
+          paddingTop = 0
+          translateZ = 1
+        }
+        let scale = 1
+        if (this.scrollY < 0) {
+          scale = 1 + Math.abs(this.scrollY / this.bgImgHeigth)
+        }
+       return {
+         height,
+         paddingTop,
+         zIndex,
+         backgroundImage: `url(${this.pic})`,
+         transform: `scale(${scale})translateZ(${translateZ}px)`
+       }
+    },
+    listStyle() {
+      return `top:${this.bgImgHeigth}px`
+    },
+    loading() {
+      return !this.songs || !this.songs.length
+    }
+  },
+  mounted() {
+    this.bgImgHeigth = this.$refs.bgImg.clientHeight
+    this.maxTranslateY = this.bgImgHeigth - RESERVED_HEIGHT
+  },
+  methods: {
+    goBack() {
+      this.$router.back()
+    },
+    onScroll(pos) {
+      this.scrollY = -pos.y
     }
   }
 }
@@ -73,8 +124,6 @@ export default {
     .bg-img {
       position: relative;
       width: 100%;
-      height: 0;
-      padding-top: 70%;
       transform-origin: top;
       background-size: cover;
       .play-btn-wrapper {

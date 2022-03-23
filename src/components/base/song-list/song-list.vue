@@ -17,9 +17,6 @@ export default {
       default: () => []
     }
   },
-  created() {
-    console.log(333, this.songs)
-  },
   methods: {
     getDesc(song) {
       return `${song.singer}·${song.album}`
