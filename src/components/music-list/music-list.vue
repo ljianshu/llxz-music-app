@@ -4,8 +4,9 @@
       <i class="icon-back"></i>
     </div>
     <h1 class="title">{{title}}</h1>
-    <div class="bg-img" :style="bgImgStyle" ref="bgImg"></div>
-    <div class="filter"></div>
+    <div class="bg-img" :style="bgImgStyle" ref="bgImg">
+      <div class="filter" :style="filterStyle"></div>
+    </div>
     <scroll class="list" v-loading="loading" :style="listStyle" :probe-type="3"
       @scroll="onScroll">
       <div class="song-list-wrapper">
@@ -49,7 +50,7 @@ export default {
         let zIndex = 0
         let paddingTop = '70%'
         let height = 0
-        // 为了处理IOS兼容性问题
+        // 这个变量为了处理IOS兼容性问题
         let translateZ = 0
         if (this.scrollY > this.maxTranslateY) {
           // 当歌单滚动距离大于最大可滚动距离时，页面头部就固定住
@@ -72,6 +73,15 @@ export default {
     },
     listStyle() {
       return `top:${this.bgImgHeigth}px`
+    },
+    filterStyle() {
+      let blur = 0
+      if (this.scrollY >= 0) {
+        blur = Math.min(this.maxTranslateY / this.bgImgHeigth, this.scrollY / this.bgImgHeigth) * 20
+      }
+      return {
+        backdropFilter: `blur(${blur}px)`
+      }
     },
     loading() {
       return !this.songs || !this.songs.length
