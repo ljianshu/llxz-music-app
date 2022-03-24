@@ -10,7 +10,7 @@
     <scroll class="list" v-loading="loading"  v-no-result:[noResultText]='noResult' :style="listStyle" :probe-type="3"
       @scroll="onScroll">
       <div class="song-list-wrapper">
-        <song-list :songs="songs"></song-list>
+        <song-list :songs="songs" @select="selectItem"></song-list>
       </div>
     </scroll>
   </div>
@@ -18,6 +18,7 @@
 <script>
 import Scroll from '@/components/base/scroll/scroll'
 import SongList from '@/components/base/song-list/song-list'
+import { mapActions } from 'vuex'
 
 const RESERVED_HEIGHT = 40
 
@@ -102,7 +103,11 @@ export default {
     },
     onScroll(pos) {
       this.scrollY = -pos.y
-    }
+    },
+    selectItem({ song, index }) {
+      this.selectPlay({ list: song, index: index })
+    },
+    ...mapActions(['selectPlay'])
   }
 }
 </script>
