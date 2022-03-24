@@ -5,6 +5,12 @@
     </div>
     <h1 class="title">{{title}}</h1>
     <div class="bg-img" :style="bgImgStyle" ref="bgImg">
+      <div class="play-btn-wrapper" :style="playBtnStyle">
+        <div class="play-btn" v-show="songs.length>0" @click="random">
+          <i class="icon-play"></i>
+          <span class="text">随机播放全部</span>
+        </div>
+      </div>
       <div class="filter" :style="filterStyle"></div>
     </div>
     <scroll class="list" v-loading="loading"  v-no-result:[noResultText]='noResult' :style="listStyle" :probe-type="3"
@@ -89,6 +95,15 @@ export default {
         backdropFilter: `blur(${blur}px)`
       }
     },
+    playBtnStyle() {
+      let display = ''
+      if (this.scrollY > this.maxTranslateY) {
+        display = 'none'
+      }
+      return {
+        display
+      }
+    },
     noResult() {
       return !this.loading && !this.songs.length
     }
@@ -101,13 +116,16 @@ export default {
     goBack() {
       this.$router.back()
     },
+    random() {
+      this.randomPlay(this.songs)
+    },
     onScroll(pos) {
       this.scrollY = -pos.y
     },
     selectItem({ song, index }) {
       this.selectPlay({ list: song, index: index })
     },
-    ...mapActions(['selectPlay'])
+    ...mapActions(['selectPlay', 'randomPlay'])
   }
 }
 </script>
