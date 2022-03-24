@@ -7,7 +7,7 @@
     <div class="bg-img" :style="bgImgStyle" ref="bgImg">
       <div class="filter" :style="filterStyle"></div>
     </div>
-    <scroll class="list" v-loading="loading" :style="listStyle" :probe-type="3"
+    <scroll class="list" v-loading="loading"  v-no-result:[noResultText]='noResult' :style="listStyle" :probe-type="3"
       @scroll="onScroll">
       <div class="song-list-wrapper">
         <song-list :songs="songs"></song-list>
@@ -36,7 +36,12 @@ export default {
       type: String,
       default: ''
     },
-    title: String
+    title: String,
+    loading: Boolean,
+    noResultText: {
+        type: String,
+        default: '抱歉，没有找到可播放的歌曲'
+      }
   },
   data() {
     return {
@@ -83,8 +88,8 @@ export default {
         backdropFilter: `blur(${blur}px)`
       }
     },
-    loading() {
-      return !this.songs || !this.songs.length
+    noResult() {
+      return !this.loading && !this.songs.length
     }
   },
   mounted() {
