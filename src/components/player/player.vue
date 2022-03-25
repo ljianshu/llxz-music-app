@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <audio ref="audioRef" @pause="pause"></audio>
+    <audio ref="audioRef" @pause="pause" @canplay="ready" @error="error"></audio>
   </div>
 </template>
 
@@ -41,23 +41,38 @@ import { useStore } from 'vuex'
 export default {
   name: 'player',
   setup() {
+      // data
+     const audioRef = ref(null)
+     const songReady = ref(false)
+    //  const currentTime = ref(0)
+
+     // vuex
     const store = useStore()
     const playlist = computed(() => store.state.playlist)
     const currentIndex = computed(() => store.state.currentIndex)
     const fullScreen = computed(() => store.state.fullScreen)
     const currentSong = computed(() => store.getters.currentSong)
     const playing = computed(() => store.state.playing)
-    const audioRef = ref(null)
+
+    // computed
+    const disableCls = computed(() => {
+      return songReady.value ? '' : 'disable'
+    })
+
     watch(currentSong, (newSong) => {
       // 点击歌单时，歌曲会播放，与此同时当前歌曲发生变化
       if (!newSong.id || !newSong.url) {
         return
       }
+      songReady.value = false
       const audioEl = audioRef.value
       audioEl.src = newSong.url
       audioEl.play()
     })
     watch(playing, (newPlaying) => {
+      if (!songReady.value) {
+        return
+      }
        const audioEl = audioRef.value
        newPlaying ? audioEl.play() : audioEl.pause()
     })
@@ -69,7 +84,7 @@ export default {
     }
     function prev() {
       const list = playlist.value
-      if (!list.length) {
+      if (!songReady.value || !list.length) {
         return
       }
       if (list.length === 1) {
@@ -89,7 +104,7 @@ export default {
     }
     function next() {
       const list = playlist.value
-      if (!list.length) {
+      if (!songReady.value || !list.length) {
         return
       }
       if (list.length === 1) {
@@ -113,12 +128,24 @@ export default {
       store.commit('setPlayingState', true)
     }
     function togglePlay() {
+       if (!songReady.value) {
+          return
+        }
       store.commit('setPlayingState', !playing.value)
       // 虽然修改了playing的状态值，但是audioEl的状态并没有改动过来,于是监听playing
     }
     function pause() {
       // 电脑处于待机状态时
       store.commit('setPlayingState', false)
+    }
+    function ready() {
+      if (songReady.value) {
+        return
+      }
+      songReady.value = true
+    }
+    function error() {
+      songReady.value = true
     }
     function toggleFavorite(currentSong) {
       console.log(111, currentSong)
@@ -139,7 +166,10 @@ export default {
       playIcon,
       pause,
       playlist,
-      currentIndex
+      currentIndex,
+      ready,
+      error,
+      disableCls
     }
   }
 }
