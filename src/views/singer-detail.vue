@@ -10,7 +10,7 @@ import { processSongs } from '@/service/song'
 import storage from 'good-storage'
 import { SINGER_KEY } from '@/assets/js/constant'
 export default {
-  name: 'SingerDetail',
+  name: 'singer-detail',
   components: {
     MusicList
   },

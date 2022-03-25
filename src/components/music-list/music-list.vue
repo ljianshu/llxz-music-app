@@ -123,7 +123,8 @@ export default {
       this.scrollY = -pos.y
     },
     selectItem({ song, index }) {
-      this.selectPlay({ list: song, index: index })
+      // ⚠️注意：这边list传递是一个歌曲列表数组
+      this.selectPlay({ list: this.songs, index: index })
     },
     ...mapActions(['selectPlay', 'randomPlay'])
   }
