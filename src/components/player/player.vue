@@ -42,6 +42,8 @@ export default {
   name: 'player',
   setup() {
     const store = useStore()
+    const playlist = computed(() => store.state.playlist)
+    const currentIndex = computed(() => store.state.currentIndex)
     const fullScreen = computed(() => store.state.fullScreen)
     const currentSong = computed(() => store.getters.currentSong)
     const playing = computed(() => store.state.playing)
@@ -66,7 +68,49 @@ export default {
       console.log(1)
     }
     function prev() {
-      console.log(2)
+      const list = playlist.value
+      if (!list.length) {
+        return
+      }
+      if (list.length === 1) {
+        loop()
+      } else {
+        let index = currentIndex.value - 1
+        if (index === -1) {
+           // 如果当前是第一首歌，往前一首就是歌曲最后一首
+          index = list.length - 1
+        }
+        store.commit('setCurrentIndex', index)
+        // 点击这个前一首歌按钮，如果是暂停状态，也要让其播放
+        if (!playing.value) {
+          store.commit('setPlayingState', true)
+        }
+      }
+    }
+    function next() {
+      const list = playlist.value
+      if (!list.length) {
+        return
+      }
+      if (list.length === 1) {
+        loop()
+      } else {
+        let index = currentIndex.value + 1
+        // 如果当前是最后一首歌，往后一首就是歌曲第一首歌
+        if (index === list.length) {
+          index = 0
+        }
+        store.commit('setCurrentIndex', index)
+        if (!playing.value) {
+          store.commit('setPlayingState', true)
+        }
+      }
+    }
+    function loop() {
+      const audioEl = audioRef.value
+      audioEl.currentTime = 0
+      audioEl.play()
+      store.commit('setPlayingState', true)
     }
     function togglePlay() {
       store.commit('setPlayingState', !playing.value)
@@ -75,9 +119,6 @@ export default {
     function pause() {
       // 电脑处于待机状态时
       store.commit('setPlayingState', false)
-    }
-    function next() {
-      console.log(4)
     }
     function toggleFavorite(currentSong) {
       console.log(111, currentSong)
@@ -96,7 +137,9 @@ export default {
       next,
       toggleFavorite,
       playIcon,
-      pause
+      pause,
+      playlist,
+      currentIndex
     }
   }
 }
