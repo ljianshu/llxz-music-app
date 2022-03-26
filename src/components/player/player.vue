@@ -38,13 +38,13 @@
 <script>
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
+import useMode from './use-mode'
 export default {
   name: 'player',
   setup() {
       // data
      const audioRef = ref(null)
      const songReady = ref(false)
-    //  const currentTime = ref(0)
 
      // vuex
     const store = useStore()
@@ -54,11 +54,18 @@ export default {
     const currentSong = computed(() => store.getters.currentSong)
     const playing = computed(() => store.state.playing)
 
+    // hooks
+    const { modeIcon, changeMode } = useMode()
+
     // computed
     const disableCls = computed(() => {
       return songReady.value ? '' : 'disable'
     })
+    const playIcon = computed(() => {
+      return playing.value ? 'icon-pause' : 'icon-play'
+    })
 
+    // watch
     watch(currentSong, (newSong) => {
       // 点击歌单时，歌曲会播放，与此同时当前歌曲发生变化
       if (!newSong.id || !newSong.url) {
@@ -76,12 +83,7 @@ export default {
        const audioEl = audioRef.value
        newPlaying ? audioEl.play() : audioEl.pause()
     })
-    const playIcon = computed(() => {
-      return playing.value ? 'icon-pause' : 'icon-play'
-    })
-    function changeMode() {
-      console.log(1)
-    }
+
     function prev() {
       const list = playlist.value
       if (!songReady.value || !list.length) {
@@ -102,6 +104,8 @@ export default {
         }
       }
     }
+
+    // methods
     function next() {
       const list = playlist.value
       if (!songReady.value || !list.length) {
@@ -169,7 +173,8 @@ export default {
       currentIndex,
       ready,
       error,
-      disableCls
+      disableCls,
+      modeIcon
     }
   }
 }

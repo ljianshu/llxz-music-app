@@ -18,3 +18,19 @@ export function randomPlay ({ commit }, { list }) {
   commit('setPlaylist', shuffle(list))
   commit('setCurrentIndex', 0) // 播放第一首歌曲
 }
+
+export function changeMode ({ commit, state, getters }, mode) {
+  // 如果是顺序列表切换到随机播放列表，列表可以要重新洗牌
+  if (mode === PLAY_MODE.random) {
+    commit('setPlaylist', shuffle(state.sequenceList))
+  } else {
+    commit('setPlaylist', state.sequenceList)
+  }
+  // 期望改变歌曲播放模式，不改变播放曲目
+  const currentSongId = getters.currentSong.id
+  const index = state.playlist.findIndex((song) => {
+    return song.id === currentSongId
+  })
+  commit('setCurrentIndex', index)
+  commit('setPlayMode', mode)
+}
