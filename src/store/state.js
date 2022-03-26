@@ -1,5 +1,6 @@
 // 播放器的初始状态
-import { PLAY_MODE } from '@/assets/js/constant'
+import storage from 'good-storage'
+import { PLAY_MODE, FAVORITE_KEY } from '@/assets/js/constant'
 
 const state = {
   sequenceList: [], // 初始播放列表
@@ -7,7 +8,8 @@ const state = {
   playing: false, // 是否播放
   playMode: PLAY_MODE.sequence, // 播放形式
   currentIndex: 0, // 当前播放首歌的序号
-  fullScreen: false // 全屏还是收缩的
+  fullScreen: false, // 全屏还是收缩的
+  favoriteList: storage.get(FAVORITE_KEY) // 收藏歌曲列表  初始化时记得从本地先读取
 }
 
 export default state
