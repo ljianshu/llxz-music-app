@@ -19,7 +19,7 @@ export default {
           },
           {
             name: '排行',
-            path: '/rank'
+            path: '/top-list'
           },
           {
             name: '搜索',

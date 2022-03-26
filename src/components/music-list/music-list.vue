@@ -16,7 +16,7 @@
     <scroll class="list" v-loading="loading"  v-no-result:[noResultText]='noResult' :style="listStyle" :probe-type="3"
       @scroll="onScroll">
       <div class="song-list-wrapper">
-        <song-list :songs="songs" @select="selectItem"></song-list>
+        <song-list :songs="songs" @select="selectItem" :rank="rank"></song-list>
       </div>
     </scroll>
   </div>
@@ -43,6 +43,7 @@ export default {
       type: String,
       default: ''
     },
+    rank: Boolean,
     title: String,
     loading: Boolean,
     noResultText: {
