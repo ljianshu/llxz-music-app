@@ -2,7 +2,7 @@
   <div>
     <div class="search-input">
       <i class="icon-search"></i>
-      <input v-model="value" class="input-inner">
+      <input v-model="value" class="input-inner" :placeholder="placeholder">
       <i class="icon-dismiss" v-show="value" @click="clear"></i>
     </div>
   </div>
@@ -11,7 +11,13 @@
 import { debounce } from 'throttle-debounce'
 export default {
   name: 'search-input',
-  props: ['modelValue'],
+  props: {
+    modelValue: String,
+    placeholder: {
+      type: String,
+      default: '搜索歌曲、歌手'
+    }
+  },
   emits: ['update:modelValue'],
   computed: {
     value: {
