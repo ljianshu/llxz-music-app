@@ -51,15 +51,16 @@ export default {
     const loadingText = ref('')
     const noResultText = ref('抱歉，暂无搜索结果')
 
+    const noResult = computed(() => {
+      console.log('321', !singer.value && !songs.value.length && !hasMore.value)
+      return !singer.value && !songs.value.length && !hasMore.value
+    })
+
     watch(() => props.query, async(newQuery) => {
       if (!newQuery) {
         return
       }
       await searchFirst()
-    })
-
-    const noResult = computed(() => {
-      return !singer.value && !songs.value.length && !hasMore.value
     })
 
     const searchFirst = async function() {
