@@ -1,15 +1,15 @@
 import BScroll from '@better-scroll/core'
-import Pullup from '@better-scroll/pull-up'
+import PullUp from '@better-scroll/pull-up'
 import ObserveDOM from '@better-scroll/slide'
 import { ref, onMounted, onUnmounted, onActivated, onDeactivated } from 'vue'
 
-BScroll.use(Pullup)
+BScroll.use(PullUp)
 BScroll.use(ObserveDOM)
 
 export default function usePullUpLoad (requestData, preventPullUpLoad) {
-  const isPullUpLoad = ref(false)
-  const rootRef = ref(null)
   const scroll = ref(null)
+  const rootRef = ref(null)
+  const isPullUpLoad = ref(false)
 
   onMounted(() => {
     const scrollVal = scroll.value = new BScroll(rootRef.value, {
@@ -22,6 +22,7 @@ export default function usePullUpLoad (requestData, preventPullUpLoad) {
 
     async function pullingUpHandler () {
       if (preventPullUpLoad.value) {
+        // 修复出现两个loading的bug,当首次加载，或者触发makeItScrollable函数时就不再下拉加载
         scrollVal.finishPullUp()
         return
       }

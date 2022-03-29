@@ -34,3 +34,38 @@ export function changeMode ({ commit, state, getters }, mode) {
   commit('setCurrentIndex', index)
   commit('setPlayMode', mode)
 }
+
+export function addSong ({ commit, state }, song) {
+  // 添加一首歌，并且播放
+  const playlist = state.playlist.slice()
+  const sequenceList = state.sequenceList.slice()
+  let currentIndex = state.currentIndex
+
+  const playIndex = findIndex(playlist, song)
+
+  if (playIndex > -1) {
+    // 找得到歌曲
+    currentIndex = playIndex
+  } else {
+    // 找不到歌曲
+    sequenceList.push(song)
+    currentIndex = playIndex.length - 1
+  }
+
+  const sequenceIndex = findIndex(sequenceList, song)
+  if (sequenceIndex === -1) {
+    sequenceList.push(song)
+  }
+
+  commit('setSequenceList', sequenceList)
+  commit('setPlaylist', playlist)
+  commit('setCurrentIndex', currentIndex)
+  commit('setPlayingState', true)
+  commit('setFullScreen', true)
+}
+
+function findIndex (list, song) {
+  return list.findIndex((item) => {
+    return item.id === song.id
+  })
+}

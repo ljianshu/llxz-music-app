@@ -24,12 +24,16 @@
           </p>
         </div>
       </li>
+      <div
+        class="suggest-item"
+        v-loading:[loadingText]="pullUpLoading"
+      ></div>
     </ul>
   </div>
 </template>
 
 <script>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, nextTick } from 'vue'
 import { search } from '@/service/search'
 import { processSongs } from '@/service/song'
 import usePullUpLoad from './use-pull-up-load'
@@ -54,7 +58,6 @@ export default {
     const manualLoading = ref(false)
 
     const noResult = computed(() => {
-      console.log('321', !singer.value && !songs.value.length && !hasMore.value)
       return !singer.value && !songs.value.length && !hasMore.value
     })
 
@@ -74,9 +77,6 @@ export default {
       }
       await searchFirst()
     })
-    async function searchMore() {
-      console.log(111)
-    }
 
     const searchFirst = async function() {
       if (!props.query) {
@@ -93,6 +93,31 @@ export default {
       hasMore.value = result.hasMore
       singer.value = result.singer
       loading.value = false
+      await nextTick()
+      await makeItScrollable()
+    }
+
+    async function searchMore() {
+      if (!hasMore.value || !props.query) {
+        return
+      }
+      page.value++
+      const result = await search(props.query, page.value, props.showSinger)
+      songs.value = songs.value.concat(await processSongs(result.songs))
+      hasMore.value = result.hasMore
+      await nextTick()
+      await makeItScrollable()
+    }
+
+    async function makeItScrollable() {
+      // 后端接口不能满足需求，兼容性处理
+      // 针对一开始songs数据为空，hasmore为true情况下，但是拖动下拉请求，songs就会出来数据
+      if (scroll.value.maxScrollY >= -1) {
+        // 页面不能滚动 容器的高度大于内容的高度
+        manualLoading.value = true
+        await searchMore()
+        manualLoading.value = false
+      }
     }
 
     function selectSong(song) {
