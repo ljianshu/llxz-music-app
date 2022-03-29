@@ -1,65 +1,54 @@
 import BScroll from '@better-scroll/core'
 import Pullup from '@better-scroll/pull-up'
-import { ref, onMounted } from 'vue'
+import ObserveDOM from '@better-scroll/slide'
+import { ref, onMounted, onUnmounted, onActivated, onDeactivated } from 'vue'
 
 BScroll.use(Pullup)
+BScroll.use(ObserveDOM)
 
 export default function usePullUpLoad (requestData, preventPullUpLoad) {
   const isPullUpLoad = ref(false)
   const rootRef = ref(null)
+  const scroll = ref(null)
 
   onMounted(() => {
-    this.bscroll = new BScroll(rootRef.value, {
-      pullUpLoad: true
+    const scrollVal = scroll.value = new BScroll(rootRef.value, {
+      pullUpLoad: true,
+      observeDOM: true,
+      click: true
     })
-    this.bscroll.on('pullingUp', this.pullingUpHandler)
+
+    scrollVal.on('pullingUp', pullingUpHandler)
+
+    async function pullingUpHandler () {
+      if (preventPullUpLoad.value) {
+        scrollVal.finishPullUp()
+        return
+      }
+      isPullUpLoad.value = true
+      await requestData()
+      scrollVal.finishPullUp()
+      scrollVal.refresh()
+      isPullUpLoad.value = false
+    }
+  })
+
+  onUnmounted(() => {
+    scroll.value.destroy()
+  })
+
+  onActivated(() => {
+    scroll.value.enable()
+    scroll.value.refresh()
+  })
+
+  onDeactivated(() => {
+    scroll.value.disable()
   })
 
   return {
+    scroll,
+    rootRef,
     isPullUpLoad
   }
 }
-
-  // data () {
-  //   return {
-  //     isPullUpLoad: false,
-  //     data: 30
-  //   }
-  // },
-  // mounted () {
-  //   this.initBscroll()
-  // },
-  // methods: {
-  //   initBscroll () {
-  //     this.bscroll = new BScroll(this.$refs.scroll, {
-  //       pullUpLoad: true
-  //     })
-
-  //     this.bscroll.on('pullingUp', this.pullingUpHandler)
-  //   },
-  //   async pullingUpHandler () {
-  //     this.isPullUpLoad = true
-
-  //     await this.requestData()
-
-  //     this.bscroll.finishPullUp()
-  //     this.bscroll.refresh()
-  //     this.isPullUpLoad = false
-  //   },
-  //   async requestData () {
-  //     try {
-  //       const newData = await this.ajaxGet(/* url */)
-  //       this.data += newData
-  //     } catch (err) {
-  //       // handle err
-  //       console.log(err)
-  //     }
-  //   },
-  //   ajaxGet (/* url */) {
-  //     return new Promise(resolve => {
-  //       setTimeout(() => {
-  //         resolve(20)
-  //       }, 1000)
-  //     })
-  //   }
-  // }

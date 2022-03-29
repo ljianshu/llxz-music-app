@@ -1,5 +1,5 @@
 <template>
-  <div class="suggest" v-loading:[loadingText]="loading" v-no-result:[noResultText]="noResult">
+  <div ref="rootRef" class="suggest" v-loading:[loadingText]="loading" v-no-result:[noResultText]="noResult">
     <ul class="suggest-list">
       <li class="suggest-item" v-if="singer" @click="selectSinger(singer)">
         <div class="icon">
@@ -32,6 +32,7 @@
 import { computed, ref, watch } from 'vue'
 import { search } from '@/service/search'
 import { processSongs } from '@/service/song'
+import usePullUpLoad from './use-pull-up-load'
 export default {
   name: 'suggest',
   props: {
@@ -50,11 +51,22 @@ export default {
     const page = ref(1)
     const loadingText = ref('')
     const noResultText = ref('抱歉，暂无搜索结果')
+    const manualLoading = ref(false)
 
     const noResult = computed(() => {
       console.log('321', !singer.value && !songs.value.length && !hasMore.value)
       return !singer.value && !songs.value.length && !hasMore.value
     })
+
+    const preventPullUpLoad = computed(() => {
+      return loading.value || manualLoading.value
+    })
+
+    const pullUpLoading = computed(() => {
+      return isPullUpLoad.value && hasMore.value
+    })
+
+    const { isPullUpLoad, rootRef, scroll } = usePullUpLoad(searchMore, preventPullUpLoad)
 
     watch(() => props.query, async(newQuery) => {
       if (!newQuery) {
@@ -62,6 +74,9 @@ export default {
       }
       await searchFirst()
     })
+    async function searchMore() {
+      console.log(111)
+    }
 
     const searchFirst = async function() {
       if (!props.query) {
@@ -96,7 +111,9 @@ export default {
       loadingText,
       noResultText,
       loading,
-      noResult
+      noResult,
+      rootRef,
+      pullUpLoading
     }
   }
 }
