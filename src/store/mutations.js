@@ -19,6 +19,9 @@ const mutations = {
   },
   setFavoriteList (state, list) {
     state.favoriteList = list
+  },
+  setSearchHistory (state, searches) {
+    state.searchHistory = searches
   }
 }
 

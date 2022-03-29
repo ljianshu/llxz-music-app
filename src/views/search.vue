@@ -33,19 +33,22 @@
         <search-list :searches="searchHistory" @select="addQuery" @delete="deleteSearch"></search-list>
       </div>
     </div>
+    <!-- 搜索歌曲、歌手结果展示 -->
     <div class="search-result" v-show="query">
-      <suggest :query="query"></suggest>
+      <suggest :query="query" @select-song="selectSong" @select-singer="selectSinger"></suggest>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useStore } from 'vuex'
 import SearchInput from '@/components/search/search-input'
 // import Confirm from '@/components/base/confirm/confirm'
 import SearchList from '@/components/base/search-list/search-list'
 import Suggest from '@/components/search/suggest'
 import { getHotKeys } from '@/service/search'
+import useSearchHistory from '@/components/search/use-search-history'
 export default {
   name: 'search',
   components: {
@@ -56,22 +59,37 @@ export default {
   setup() {
     const query = ref('')
     const hotKeys = ref([])
-    const searchHistory = ref([])
+    const store = useStore()
+
+    const { saveSearch, deleteSearch, clearSearch } = useSearchHistory()
+
+    const searchHistory = computed(() => store.state.searchHistory)
     getHotKeys().then((result) => {
       hotKeys.value = result.hotKeys
     })
     const addQuery = (params) => {
       query.value = params
     }
-    const deleteSearch = (item) => {
-      console.log(22)
+    const selectSong = (song) => {
+      // 这时候将查询歌曲的名字存入本地和vuex
+      console.log('song', song, query)
+      saveSearch(query.value)
+    }
+    const selectSinger = (sing) => {
+      // 这时候将查询歌手的名字存入本地和vuex
+       console.log('sing', sing, query)
+      saveSearch(query.value)
     }
     return {
       query,
       hotKeys,
       addQuery,
       searchHistory,
-      deleteSearch
+      deleteSearch,
+      saveSearch,
+      clearSearch,
+      selectSong,
+      selectSinger
     }
   }
 }
