@@ -3,7 +3,7 @@
     <div class="search-input-wrapper">
       <search-input v-model="query"></search-input>
     </div>
-    <scroll class="search-content" v-show="!query">
+    <scroll class="search-content" ref="scrollRef" v-show="!query">
       <div>
         <div class="hot-keys">
           <h1 class="title">热门搜索</h1>
@@ -25,12 +25,12 @@
               <i class="icon-clear"></i>
             </span>
           </h1>
-          <!-- <confirm
+          <confirm
             ref="confirmRef"
             text="是否清空所有搜索历史"
             confirm-btn-text="清空"
             @confirm="clearSearch"
-          > -->
+          />
           <search-list :searches="searchHistory" @select="addQuery" @delete="deleteSearch"></search-list>
         </div>
       </div>
@@ -43,11 +43,11 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import SearchInput from '@/components/search/search-input'
-// import Confirm from '@/components/base/confirm/confirm'
+import Confirm from '@/components/base/confirm/confirm'
 import SearchList from '@/components/base/search-list/search-list'
 import Suggest from '@/components/search/suggest'
 import { getHotKeys } from '@/service/search'
@@ -62,18 +62,34 @@ export default {
     SearchInput,
     Suggest,
     SearchList,
-    Scroll
+    Scroll,
+    Confirm
   },
   setup() {
     const query = ref('')
     const hotKeys = ref([])
     const selectedSinger = ref(null)
+    const scrollRef = ref(null)
+    const confirmRef = ref(null)
+
     const store = useStore()
     const router = useRouter()
 
     const { saveSearch, deleteSearch, clearSearch } = useSearchHistory()
 
     const searchHistory = computed(() => store.state.searchHistory)
+
+    watch(query, async(newQuery) => {
+      // 清空输入搜索歌曲名字后，修复搜索页不能滚动的bug
+      if (!newQuery) {
+        await nextTick()
+        refreshScroll()
+      }
+    })
+    function refreshScroll() {
+      scrollRef.value.scroll.refresh()
+    }
+
     getHotKeys().then((result) => {
       hotKeys.value = result.hotKeys
     })
@@ -101,6 +117,11 @@ export default {
     function cacheSinger(singer) {
       storage.session.set(SINGER_KEY, singer)
     }
+
+    function showConfirm() {
+      confirmRef.value.show()
+    }
+
     return {
       query,
       hotKeys,
@@ -110,7 +131,10 @@ export default {
       saveSearch,
       clearSearch,
       selectSong,
-      selectSinger
+      selectSinger,
+      scrollRef,
+      confirmRef,
+      showConfirm
     }
   }
 }
