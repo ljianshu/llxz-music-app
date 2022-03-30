@@ -10,11 +10,11 @@
   </div>
 </template>
 <script>
-import createMusicDetailComponent from '@/assets/js/create-music-detail-component'
+import createDetailComponent from '@/assets/js/create-detail-component'
 import { getTopDetail } from '@/service/top-list'
 import { TOP_KEY } from '@/assets/js/constant'
 
-export default createMusicDetailComponent('top-detail', TOP_KEY, getTopDetail)
+export default createDetailComponent('top-detail', TOP_KEY, getTopDetail)
 
 </script>
 <style lang='scss' scoped>
