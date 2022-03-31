@@ -10,7 +10,7 @@ export function selectPlay ({ commit }, { list, index }) {
   commit('setCurrentIndex', index) // 当前歌曲的序号
 }
 
-export function randomPlay ({ commit }, { list }) {
+export function randomPlay ({ commit }, list) {
   commit('setPlayMode', PLAY_MODE.random)
   commit('setSequenceList', list)
   commit('setPlayingState', true)
