@@ -12,6 +12,18 @@
         <h2 class="subtitle">{{currentSong.singer}}</h2>
       </div>
       <div class="bottom">
+        <div class="progress-wrapper">
+          <div class="time time-l">{{formatTime(currentTime)}}</div>
+          <div class="progress-bar-wrapper">
+              <progress-bar
+                ref="barRef"
+                :progress="progress"
+                @progress-changing="onProgressChanging"
+                @progress-changed="onProgressChanged"
+              ></progress-bar>
+            </div>
+          <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
+        </div>
         <div class="operators">
           <div class="icon i-left">
             <i @click="changeMode" :class="modeIcon"></i>
@@ -31,7 +43,7 @@
         </div>
       </div>
     </div>
-    <audio ref="audioRef" @pause="pause" @canplay="ready" @error="error"></audio>
+    <audio ref="audioRef" @pause="pause" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
 </template>
 
@@ -40,12 +52,20 @@ import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import useMode from './use-mode'
 import useFavorite from './use-favorite'
+import ProgressBar from './progress-bar'
+import { formatTime } from '@/assets/js/util'
+import { PLAY_MODE } from '@/assets/js/constant'
 export default {
   name: 'player',
+  components: {
+    ProgressBar
+  },
   setup() {
       // data
      const audioRef = ref(null)
      const songReady = ref(false)
+     const currentTime = ref(0) // 歌曲播放时间
+     let progressChanging = false
 
      // vuex
     const store = useStore()
@@ -54,6 +74,7 @@ export default {
     const fullScreen = computed(() => store.state.fullScreen)
     const currentSong = computed(() => store.getters.currentSong)
     const playing = computed(() => store.state.playing)
+    const playMode = computed(() => store.state.playMode)
 
     // hooks
     const { modeIcon, changeMode } = useMode()
@@ -66,6 +87,9 @@ export default {
     const playIcon = computed(() => {
       return playing.value ? 'icon-pause' : 'icon-play'
     })
+    const progress = computed(() => {
+      return currentTime.value / currentSong.value.duration
+    })
 
     // watch
     watch(currentSong, (newSong) => {
@@ -73,6 +97,7 @@ export default {
       if (!newSong.id || !newSong.url) {
         return
       }
+      currentTime.value = 0
       songReady.value = false
       const audioEl = audioRef.value
       audioEl.src = newSong.url
@@ -85,6 +110,37 @@ export default {
        const audioEl = audioRef.value
        newPlaying ? audioEl.play() : audioEl.pause()
     })
+
+    // methods
+
+    // 歌曲播放结束时,根据播放模式，选择进入下一首歌曲
+    function end() {
+      currentTime.value = 0
+      if (playMode.value === PLAY_MODE.loop) {
+        loop()
+      } else {
+        next()
+      }
+    }
+    function onProgressChanging(progress) {
+      // 这个触发多次
+      progressChanging = true
+      currentTime.value = currentSong.value.duration * progress
+    }
+    function onProgressChanged(progress) {
+       // 这个只触发一次 真实修改
+       progressChanging = false
+      audioRef.value.currentTime = currentTime.value = currentSong.value.duration * progress
+
+      if (!playing.value) {
+          store.commit('setPlayingState', true)
+        }
+    }
+    function updateTime(e) {
+      if (!progressChanging) {
+        currentTime.value = e.target.currentTime
+      }
+    }
 
     function prev() {
       const list = playlist.value
@@ -107,7 +163,6 @@ export default {
       }
     }
 
-    // methods
     function next() {
       const list = playlist.value
       if (!songReady.value || !list.length) {
@@ -174,7 +229,16 @@ export default {
       error,
       disableCls,
       modeIcon,
-      getFavoriteIcon
+      getFavoriteIcon,
+      progress,
+      formatTime,
+      updateTime,
+      onProgressChanging,
+      onProgressChanged,
+      currentTime,
+      end,
+      playMode,
+      PLAY_MODE
     }
   }
 }
@@ -240,6 +304,29 @@ export default {
         position: absolute;
         bottom: 50px;
         width: 100%;
+        .progress-wrapper {
+          display: flex;
+          align-items: center;
+          width: 80%;
+          margin: 0px auto;
+          padding: 10px 0;
+          .time {
+            color: $color-text;
+            font-size: $font-size-small;
+            flex: 0 0 40px;
+            line-height: 30px;
+            width: 40px;
+            &.time-l {
+              text-align: left;
+            }
+            &.time-r {
+              text-align: right;
+            }
+          }
+          .progress-bar-wrapper {
+            flex: 1;
+          }
+        }
         .operators {
           display: flex;
           align-items: center;
