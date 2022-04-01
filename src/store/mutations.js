@@ -22,6 +22,14 @@ const mutations = {
   },
   setSearchHistory (state, searches) {
     state.searchHistory = searches
+  },
+  addSongLyric (state, { song, lyric }) {
+    state.sequenceList.map(item => {
+      if (item.mid === song.mid) {
+        item.lyric = lyric
+      }
+      return item
+    })
   }
 }
 

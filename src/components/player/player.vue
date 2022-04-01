@@ -12,13 +12,27 @@
         <h2 class="subtitle">{{currentSong.singer}}</h2>
       </div>
       <div class="middle">
+        <!-- 歌曲CD旋转 -->
         <div class="middle-l">
           <div class="cd-wrapper">
             <div class="cd" ref="cdRef">
               <img ref="cdImageRef" class="image" :class="cdCls" :src="currentSong.pic">
             </div>
           </div>
+          <!-- <div class="playing-lyric-wrapper">
+            <div class="playing-lyric">{{playingLyric}}</div>
+          </div> -->
         </div>
+        <!-- 歌词列表 -->
+        <scroll class="middle-r" ref="lyricScrollRef">
+          <div class="lyric-wrapper">
+            <div ref="lyricListRef" v-if="currentLyric">
+              <p class="text" :class="{'current': currentLineNum ===index}" v-for="(line,index) in currentLyric.lines" :key="line.num">
+                {{line.txt}}
+              </p>
+            </div>
+          </div>
+        </scroll>
       </div>
       <div class="bottom">
         <div class="progress-wrapper">
@@ -61,14 +75,17 @@ import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import useMode from './use-mode'
 import useCd from './use-cd'
+import useLyric from './use-lyric'
 import useFavorite from './use-favorite'
 import ProgressBar from './progress-bar'
 import { formatTime } from '@/assets/js/util'
 import { PLAY_MODE } from '@/assets/js/constant'
+import Scroll from '@/components/base/scroll/scroll'
 export default {
   name: 'player',
   components: {
-    ProgressBar
+    ProgressBar,
+    Scroll
   },
   setup() {
       // data
@@ -90,6 +107,8 @@ export default {
     const { cdCls, cdRef, cdImageRef } = useCd()
     const { modeIcon, changeMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
+    const { currentLyric, currentLineNum } = useLyric()
+    console.log('currentLyric', currentLyric.value)
 
     // computed
     const disableCls = computed(() => {
@@ -252,7 +271,9 @@ export default {
       PLAY_MODE,
       cdCls,
       cdImageRef,
-      cdRef
+      cdRef,
+      currentLyric,
+      currentLineNum
     }
   }
 }
