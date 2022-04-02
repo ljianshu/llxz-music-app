@@ -19,9 +19,9 @@
               <img ref="cdImageRef" class="image" :class="cdCls" :src="currentSong.pic">
             </div>
           </div>
-          <!-- <div class="playing-lyric-wrapper">
+          <div class="playing-lyric-wrapper">
             <div class="playing-lyric">{{playingLyric}}</div>
-          </div> -->
+          </div>
         </div>
         <!-- 歌词列表 -->
         <scroll class="middle-r" ref="lyricScrollRef">
@@ -66,6 +66,7 @@
         </div>
       </div>
     </div>
+    <mini-player></mini-player>
     <audio ref="audioRef" @pause="pause" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
 </template>
@@ -81,11 +82,13 @@ import ProgressBar from './progress-bar'
 import { formatTime } from '@/assets/js/util'
 import { PLAY_MODE } from '@/assets/js/constant'
 import Scroll from '@/components/base/scroll/scroll'
+import MiniPlayer from '@/components/player/mini-player'
 export default {
   name: 'player',
   components: {
     ProgressBar,
-    Scroll
+    Scroll,
+    MiniPlayer
   },
   setup() {
       // data
@@ -107,8 +110,7 @@ export default {
     const { cdCls, cdRef, cdImageRef } = useCd()
     const { modeIcon, changeMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
-    const { currentLyric, currentLineNum } = useLyric()
-    console.log('currentLyric', currentLyric.value)
+    const { currentLyric, currentLineNum, playLyric, playingLyric } = useLyric({ songReady, currentTime })
 
     // computed
     const disableCls = computed(() => {
@@ -138,7 +140,12 @@ export default {
         return
       }
        const audioEl = audioRef.value
-       newPlaying ? audioEl.play() : audioEl.pause()
+       if (newPlaying) {
+          audioEl.play()
+          playLyric()
+        } else {
+          audioEl.pause()
+        }
     })
 
     // methods
@@ -161,7 +168,6 @@ export default {
        // 这个只触发一次 真实修改
        progressChanging = false
       audioRef.value.currentTime = currentTime.value = currentSong.value.duration * progress
-
       if (!playing.value) {
           store.commit('setPlayingState', true)
         }
@@ -234,6 +240,7 @@ export default {
         return
       }
       songReady.value = true
+      playLyric()
     }
     function error() {
       songReady.value = true
@@ -273,7 +280,8 @@ export default {
       cdImageRef,
       cdRef,
       currentLyric,
-      currentLineNum
+      currentLineNum,
+      playingLyric
     }
   }
 }
@@ -343,7 +351,7 @@ export default {
         white-space: nowrap;
         font-size: 0;
         .middle-l {
-          display: inline-block;
+          display: none;
           vertical-align: top;
           position: relative;
           width: 100%;
