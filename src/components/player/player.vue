@@ -1,5 +1,5 @@
 <template>
-  <div class="player">
+  <div class="player" v-show="playlist.length">
     <div class="normal-player" v-if="fullScreen">
       <div class="background">
         <img :src="currentSong.pic" >
@@ -66,13 +66,13 @@
         </div>
       </div>
     </div>
-    <mini-player></mini-player>
+    <mini-player :progress="progress" :toggle-play="togglePlay"></mini-player>
     <audio ref="audioRef" @pause="pause" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
 </template>
 
 <script>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import useMode from './use-mode'
 import useCd from './use-cd'
@@ -96,6 +96,7 @@ export default {
      const songReady = ref(false)
      const currentTime = ref(0) // 歌曲播放时间
      let progressChanging = false
+     const barRef = ref(null)
 
      // vuex
     const store = useStore()
@@ -147,7 +148,12 @@ export default {
           audioEl.pause()
         }
     })
-
+    // 当歌曲页面全屏时，重新计算进度条
+    watch(fullScreen, async(newFullScreen) => {
+      await nextTick()
+      // 因为setOffset有用到dom的API，必须要在dom更新后，才触发方法
+      barRef.value.setOffset(progress.value)
+    })
     // methods
 
     // 歌曲播放结束时,根据播放模式，选择进入下一首歌曲
@@ -281,7 +287,8 @@ export default {
       cdRef,
       currentLyric,
       currentLineNum,
-      playingLyric
+      playingLyric,
+      barRef
     }
   }
 }

@@ -38,6 +38,8 @@ export default {
   },
   watch: {
     progress(newProgress) {
+      // 这边封装成一个函数，主要是方便于外部调用
+      // 当fullScreen为true时，重新计算进度条offset
       this.setOffset(newProgress)
     }
   },
@@ -46,7 +48,7 @@ export default {
   },
   methods: {
     setOffset(progress) {
-      // 设置按钮移动距离
+      // 设置进度条移动距离
       const barWidth = this.$el.clientWidth - progressBtnWidth
       this.offset = barWidth * progress
     },

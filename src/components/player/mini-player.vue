@@ -1,13 +1,34 @@
 <template>
   <transition name="mini">
-    <div class="mini-player" v-show="!fullScreen">
+    <div class="mini-player" v-show="!fullScreen" @click="showNormalPlayer">
       <div class="cd-wrapper">
-        <div class="cd">
-          <img :src="currentSong.pic" width="40" height="40">
+        <div ref="cdRef" class="cd">
+          <img :src="currentSong.pic" ref="cdImageRef" :class="cdCls" width="40" height="40">
         </div>
       </div>
-      <h2 class="name">{{currentSong.name}}</h2>
-      <p class="desc">{{currentSong.singer}}</p>
+      <div ref="sliderWrapperRef" class="slider-wrapper">
+        <div class="slider-group">
+          <div
+            class="slider-page"
+            v-for="song in playlist"
+            :key="song.id"
+          >
+            <h2 class="name">{{song.name}}</h2>
+            <p class="desc">{{song.singer}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="control">
+        <!-- 播放进度小圆图标 -->
+        <progress-circle :radius="32" :progress="progress">
+          <i
+            class="icon-mini"
+            :class="miniPlayIcon"
+            @click.stop="togglePlay"
+          ></i>
+        </progress-circle>
+      </div>
     </div>
   </transition>
 </template>
@@ -15,8 +36,22 @@
 <script>
 import { useStore } from 'vuex'
 import { computed } from 'vue'
+import useCd from './use-cd'
+import useMiniSlider from './use-mini-slider'
+import ProgressCircle from './progress-circle'
+
 export default {
   name: 'mini-player',
+  components: {
+    ProgressCircle
+  },
+  props: {
+    progress: {
+      type: Number,
+      default: 0
+    },
+    togglePlay: Function
+  },
   setup() {
     const store = useStore()
     const fullScreen = computed(() => store.state.fullScreen)
@@ -24,11 +59,26 @@ export default {
     const playing = computed(() => store.state.playing)
     const playlist = computed(() => store.state.playlist)
 
+    const { sliderWrapperRef } = useMiniSlider()
+    const { cdCls, cdRef, cdImageRef } = useCd()
+    function showNormalPlayer() {
+      store.commit('setFullScreen', true)
+    }
+    // mini-player 播放还是暂停按钮
+    const miniPlayIcon = computed(() => {
+      return playing.value ? 'icon-pause-mini' : 'icon-play-mini'
+    })
     return {
       fullScreen,
       currentSong,
       playing,
-      playlist
+      playlist,
+      cdCls,
+      cdRef,
+      cdImageRef,
+      showNormalPlayer,
+      miniPlayIcon,
+      sliderWrapperRef
     }
   }
 }
@@ -63,6 +113,17 @@ export default {
           }
         }
       }
+    }
+    .name {
+      margin-bottom: 2px;
+      @include no-wrap();
+      font-size: $font-size-medium;
+      color: $color-text;
+    }
+    .desc {
+      @include no-wrap();
+      font-size: $font-size-small;
+      color: $color-text-d;
     }
     .slider-wrapper {
       display: flex;
