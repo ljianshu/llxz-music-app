@@ -26,10 +26,14 @@
         <!-- 歌词列表 -->
         <scroll class="middle-r" ref="lyricScrollRef">
           <div class="lyric-wrapper">
+            <!-- currentLyric为歌曲的所有歌词 -->
             <div ref="lyricListRef" v-if="currentLyric">
-              <p class="text" :class="{'current': currentLineNum ===index}" v-for="(line,index) in currentLyric.lines" :key="line.num">
+              <p class="text" :class="{'current': currentLineNum === index}" v-for="(line,index) in currentLyric.lines" :key="line.num">
                 {{line.txt}}
               </p>
+            </div>
+            <div class="pure-music" v-show="pureMusicLyric">
+              <p>{{pureMusicLyric}}</p>
             </div>
           </div>
         </scroll>
@@ -111,7 +115,10 @@ export default {
     const { cdCls, cdRef, cdImageRef } = useCd()
     const { modeIcon, changeMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
-    const { currentLyric, currentLineNum, playLyric, playingLyric } = useLyric({ songReady, currentTime })
+    const {
+ currentLyric, currentLineNum, playLyric, playingLyric, lyricScrollRef,
+    lyricListRef, stopLyric, pureMusicLyric
+} = useLyric({ songReady, currentTime })
 
     // computed
     const disableCls = computed(() => {
@@ -145,14 +152,17 @@ export default {
           audioEl.play()
           playLyric()
         } else {
+          stopLyric()
           audioEl.pause()
         }
     })
     // 当歌曲页面全屏时，重新计算进度条
     watch(fullScreen, async(newFullScreen) => {
-      await nextTick()
+      if (newFullScreen) {
+        await nextTick()
       // 因为setOffset有用到dom的API，必须要在dom更新后，才触发方法
       barRef.value.setOffset(progress.value)
+      }
     })
     // methods
 
@@ -169,14 +179,17 @@ export default {
       // 这个触发多次
       progressChanging = true
       currentTime.value = currentSong.value.duration * progress
+      playLyric()
+      stopLyric()
     }
     function onProgressChanged(progress) {
-       // 这个只触发一次 真实修改
-       progressChanging = false
+      // 这个只触发一次 真实修改
+      progressChanging = false
       audioRef.value.currentTime = currentTime.value = currentSong.value.duration * progress
       if (!playing.value) {
-          store.commit('setPlayingState', true)
-        }
+        store.commit('setPlayingState', true)
+      }
+      playLyric()
     }
     function updateTime(e) {
       if (!progressChanging) {
@@ -246,6 +259,7 @@ export default {
         return
       }
       songReady.value = true
+      // 触发歌词实时跟随，这样保证歌曲和歌词同步
       playLyric()
     }
     function error() {
@@ -288,7 +302,10 @@ export default {
       currentLyric,
       currentLineNum,
       playingLyric,
-      barRef
+      barRef,
+      lyricScrollRef,
+      lyricListRef,
+      pureMusicLyric
     }
   }
 }
