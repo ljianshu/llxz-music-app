@@ -11,10 +11,10 @@
         <h1 class="title">{{currentSong.name}}</h1>
         <h2 class="subtitle">{{currentSong.singer}}</h2>
       </div>
-      <div class="middle">
+      <div class="middle" @touchstart.prevent="onMiddleTouchStart" @touchmove.prevent="onMiddleTouchMove" @touchend.prevent="onMiddleTouchEnd">
         <!-- 歌曲CD旋转 -->
-        <div class="middle-l">
-          <div class="cd-wrapper">
+        <div class="middle-l" :style="middleLStyle">
+          <div ref="cdWrapperRef" class="cd-wrapper">
             <div class="cd" ref="cdRef">
               <img ref="cdImageRef" class="image" :class="cdCls" :src="currentSong.pic">
             </div>
@@ -24,7 +24,7 @@
           </div>
         </div>
         <!-- 歌词列表 -->
-        <scroll class="middle-r" ref="lyricScrollRef">
+        <scroll class="middle-r" ref="lyricScrollRef" :style="middleRStyle">
           <div class="lyric-wrapper">
             <!-- currentLyric为歌曲的所有歌词 -->
             <div ref="lyricListRef" v-if="currentLyric">
@@ -39,6 +39,10 @@
         </scroll>
       </div>
       <div class="bottom">
+        <div class="dot-wrapper">
+          <span class="dot" :class="{'active':currentShow==='cd'}"></span>
+          <span class="dot" :class="{'active':currentShow==='lyric'}"></span>
+        </div>
         <div class="progress-wrapper">
           <div class="time time-l">{{formatTime(currentTime)}}</div>
           <div class="progress-bar-wrapper">
@@ -81,6 +85,7 @@ import { useStore } from 'vuex'
 import useMode from './use-mode'
 import useCd from './use-cd'
 import useLyric from './use-lyric'
+import useMiddleInteractive from './use-middle-interactive.js'
 import useFavorite from './use-favorite'
 import ProgressBar from './progress-bar'
 import { formatTime } from '@/assets/js/util'
@@ -119,7 +124,7 @@ export default {
  currentLyric, currentLineNum, playLyric, playingLyric, lyricScrollRef,
     lyricListRef, stopLyric, pureMusicLyric
 } = useLyric({ songReady, currentTime })
-
+   const { currentShow, middleLStyle, middleRStyle, onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd } = useMiddleInteractive()
     // computed
     const disableCls = computed(() => {
       return songReady.value ? '' : 'disable'
@@ -305,7 +310,13 @@ export default {
       barRef,
       lyricScrollRef,
       lyricListRef,
-      pureMusicLyric
+      pureMusicLyric,
+      currentShow,
+      middleLStyle,
+      middleRStyle,
+      onMiddleTouchStart,
+      onMiddleTouchMove,
+      onMiddleTouchEnd
     }
   }
 }
@@ -452,6 +463,24 @@ export default {
         position: absolute;
         bottom: 50px;
         width: 100%;
+        .dot-wrapper {
+          text-align: center;
+          font-size: 0;
+          .dot {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 4px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: $color-text-l;
+            &.active {
+              width: 20px;
+              border-radius: 5px;
+              background: $color-text-ll;
+            }
+          }
+        }
         .progress-wrapper {
           display: flex;
           align-items: center;

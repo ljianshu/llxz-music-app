@@ -69,7 +69,6 @@ export default function useLyric ({ songReady, currentTime }) {
 
   function playLyric () {
     // 播放歌词
-    console.log('currentLyric', currentLyric.value)
     const currentLyricVal = currentLyric.value
     if (currentLyricVal) {
       currentLyricVal.seek(currentTime.value * 1000)
