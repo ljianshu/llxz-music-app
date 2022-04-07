@@ -70,7 +70,7 @@ function findIndex (list, song) {
   })
 }
 
-export function deleteSong ({ commit, state }, song) {
+export function removeSong ({ commit, state }, song) {
   const playlist = state.playlist.slice()
   const sequenceList = state.sequenceList.slice()
 

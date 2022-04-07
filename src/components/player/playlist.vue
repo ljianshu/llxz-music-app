@@ -160,7 +160,7 @@ export default {
         return
       }
       removing.value = true
-      store.dispatch('deleteSong', song)
+      store.dispatch('removeSong', song)
       if (!playlist.value.length) {
         hide()
       }

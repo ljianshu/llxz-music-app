@@ -13,7 +13,7 @@
       </div>
       <div class="filter" :style="filterStyle"></div>
     </div>
-    <scroll class="list" v-loading="loading"  v-no-result:[noResultText]='noResult' :style="listStyle" :probe-type="3"
+    <scroll class="list" v-loading="loading"  v-no-result:[noResultText]='noResult' :style="scrollStyle" :probe-type="3"
       @scroll="onScroll">
       <div class="song-list-wrapper">
         <song-list :songs="songs" @select="selectItem" :rank="rank"></song-list>
@@ -24,7 +24,7 @@
 <script>
 import Scroll from '@/components/base/scroll/scroll'
 import SongList from '@/components/base/song-list/song-list'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 const RESERVED_HEIGHT = 40
 
@@ -84,8 +84,13 @@ export default {
          transform: `scale(${scale})translateZ(${translateZ}px)`
        }
     },
-    listStyle() {
-      return `top:${this.bgImgHeigth}px`
+    scrollStyle() {
+      // 有miniplayer 滚动列表高度自适应 bottom就要调整
+      const bottom = this.playlist.length ? '60px' : '0'
+      return {
+        top: `${this.bgImgHeigth}px`,
+        bottom
+      }
     },
     filterStyle() {
       let blur = 0
@@ -107,7 +112,8 @@ export default {
     },
     noResult() {
       return !this.loading && !this.songs.length
-    }
+    },
+    ...mapState(['playlist'])
   },
   mounted() {
     this.bgImgHeigth = this.$refs.bgImg.clientHeight
