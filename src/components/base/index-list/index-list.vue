@@ -19,7 +19,7 @@
 </template>
 <script>
 import useFixed from './use-fixed'
-import Scroll from '../scroll/scroll.vue'
+import Scroll from '@/components/wrap-scroll'
 export default {
   name: 'index-list',
   components: { Scroll },

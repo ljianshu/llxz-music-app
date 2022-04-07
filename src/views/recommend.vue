@@ -37,7 +37,7 @@
 
 <script>
 import Slider from '@/components/base/slider/slider'
-import Scroll from '@/components/base/scroll/scroll'
+import Scroll from '@/components/wrap-scroll'
 import { getRecommend } from '@/service/recommend'
 import { ALBUM_KEY } from '@/assets/js/constant'
 import storage from 'good-storage'
