@@ -70,7 +70,7 @@
           text="是否清空播放列表？"
           confirm-btn-text="清空"
         ></confirm>
-        <add-song ref="addSongRef"></add-song>
+        <!-- <add-song ref="addSongRef"></add-song> -->
       </div>
     </transition>
   </teleport>
@@ -78,6 +78,7 @@
 
 <script>
 import Scroll from '@/components/base/scroll/scroll'
+import Confirm from '@/components/base/confirm/confirm'
 import { ref, computed, nextTick, watch } from 'vue'
 import { useStore } from 'vuex'
 import useFavorite from './use-favorite'
@@ -86,9 +87,12 @@ import useMode from './use-mode'
 export default {
   name: 'playlist',
   components: {
-    Scroll
+    Scroll,
+    Confirm
   },
   setup() {
+    const confirmRef = ref(null)
+    const removing = ref(false)
     const visible = ref(false)
     const scrollRef = ref(null)
     const listRef = ref(null)
@@ -103,6 +107,7 @@ export default {
     watch(currentSong, async(newSong) => {
       // 当歌曲切换时，当前播放歌曲能在歌曲列表第一首
       if (!visible.value || !newSong.id) {
+        // 说明歌曲已经被删除了
         return
       }
       await nextTick()
@@ -129,6 +134,16 @@ export default {
       scrollRef.value.scroll.scrollToElement(target, 300)
     }
 
+    function showConfirm() {
+      confirmRef.value.show()
+    }
+
+    // 清空歌曲
+    function confirmClear() {
+      store.dispatch('clearSongList')
+      hide()
+    }
+
     // 歌曲列表中切换歌曲
     function selectItem(song) {
       const index = playlist.value.findIndex((item) => {
@@ -140,10 +155,18 @@ export default {
     }
     // 移除歌曲
     function removeSong(song) {
+      if (removing.value) {
+        // 防止多次触发删除
+        return
+      }
+      removing.value = true
       store.dispatch('deleteSong', song)
       if (!playlist.value.length) {
         hide()
       }
+      setTimeout(() => {
+        removing.value = false
+      }, 300)
     }
 
     function hide() {
@@ -172,7 +195,11 @@ export default {
       scrollRef,
       listRef,
       selectItem,
-      removeSong
+      removeSong,
+      removing,
+      confirmClear,
+      showConfirm,
+      confirmRef
     }
   }
 }

@@ -93,4 +93,14 @@ export function deleteSong ({ commit, state }, song) {
     currentIndex--
   }
   commit('setCurrentIndex', currentIndex)
+  if (!playlist.length) {
+    commit('setPlayingState', false)
+  }
+}
+
+export function clearSongList ({ commit }) {
+  commit('setSequenceList', [])
+  commit('setPlaylist', [])
+  commit('setCurrentIndex', 0)
+  commit('setPlayingState', false)
 }
