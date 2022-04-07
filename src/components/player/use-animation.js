@@ -47,26 +47,26 @@ export default function useAnimation () {
     }
     leaving = true
     // 另外一种实现动画方式
-    const { x, y, scale } = getPosAndScale()
-    const cdWrapperEl = cdWrapperRef.value
+    // const { x, y, scale } = getPosAndScale()
+    // const cdWrapperEl = cdWrapperRef.value
 
-    cdWrapperEl.style.transition = 'all .6s cubic-bezier(0.45, 0, 0.55, 1)'
-    cdWrapperEl.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`
-    cdWrapperEl.addEventListener('transitionend', next)
+    // cdWrapperEl.style.transition = 'all .6s cubic-bezier(0.45, 0, 0.55, 1)'
+    // cdWrapperEl.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`
+    // cdWrapperEl.addEventListener('transitionend', next)
 
-    function next () {
-      // 解绑事件
-      cdWrapperEl.removeEventListener('transitionend', next)
-      done()
-    }
+    // function next () {
+    //   // 解绑事件
+    //   cdWrapperEl.removeEventListener('transitionend', next)
+    //   done()
+    // }
   }
 
   function afterLeave () {
     leaving = false
-    const cdWrapperEl = cdWrapperRef.value
+    // const cdWrapperEl = cdWrapperRef.value
 
-    cdWrapperEl.style.transition = ''
-    cdWrapperEl.style.transform = ''
+    // cdWrapperEl.style.transition = ''
+    // cdWrapperEl.style.transform = ''
   }
 
   // 计算两个圆心的横坐标 纵坐标偏移量

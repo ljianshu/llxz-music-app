@@ -69,3 +69,28 @@ function findIndex (list, song) {
     return item.id === song.id
   })
 }
+
+export function deleteSong ({ commit, state }, song) {
+  const playlist = state.playlist.slice()
+  const sequenceList = state.sequenceList.slice()
+
+  const sequenceIndex = findIndex(sequenceList, song)
+  const playIndex = findIndex(playlist, song)
+
+  if (sequenceIndex < 0 || playIndex < 0) {
+    return
+  }
+  playlist.splice(playIndex, 1)
+  sequenceList.splice(playIndex, 1)
+
+  // state的修改只能通过mutation，不然会报错
+  commit('setSequenceList', sequenceList)
+  commit('setPlaylist', playlist)
+  // 删除前面歌曲，currentIndex会发生变化，播放歌曲也就发生变化
+  // 删除最后一首歌也会出错，因为currentIndex不会变
+  let currentIndex = state.currentIndex
+  if (playIndex < currentIndex || currentIndex === playlist.length) {
+    currentIndex--
+  }
+  commit('setCurrentIndex', currentIndex)
+}
