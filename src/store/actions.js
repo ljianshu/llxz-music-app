@@ -48,8 +48,8 @@ export function addSong ({ commit, state }, song) {
     currentIndex = playIndex
   } else {
     // 找不到歌曲
-    sequenceList.push(song)
-    currentIndex = playIndex.length - 1
+    playlist.push(song)
+    currentIndex = playlist.length - 1
   }
 
   const sequenceIndex = findIndex(sequenceList, song)

@@ -39,6 +39,11 @@
     <div class="search-result" v-show="query">
       <suggest :query="query" @select-song="selectSong" @select-singer="selectSinger"></suggest>
     </div>
+    <router-view v-slot="{ Component }">
+      <transition appear name="slide">
+        <component :is="Component" :data="selectedSinger"/>
+      </transition>
+    </router-view>
   </div>
 </template>
 
@@ -102,7 +107,8 @@ export default {
       // 播放歌曲
       store.dispatch('addSong', song)
     }
-    const selectSinger = (singer) => {
+
+    function selectSinger(singer) {
       // 这时候将查询歌手的名字存入本地和vuex
       // 直接跳转到二级路由SingerDetail
       saveSearch(query.value)
@@ -134,7 +140,8 @@ export default {
       selectSinger,
       scrollRef,
       confirmRef,
-      showConfirm
+      showConfirm,
+      selectedSinger
     }
   }
 }
