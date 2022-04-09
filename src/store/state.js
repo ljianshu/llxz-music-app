@@ -10,7 +10,8 @@ const state = {
   currentIndex: 0, // 当前播放首歌的序号
   fullScreen: false, // 全屏还是收缩的
   favoriteList: storage.get(FAVORITE_KEY) || [], // 收藏歌曲列表  初始化时记得从本地先读取
-  searchHistory: storage.get(SEARCH_KEY) || [] // 搜索历史记录 刷新页面时从本地先读取
+  searchHistory: storage.get(SEARCH_KEY) || [], // 搜索历史记录 刷新页面时从本地先读取
+  playHistory: []
 }
 
 export default state
