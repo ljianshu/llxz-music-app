@@ -19,6 +19,7 @@
             v-model="currentIndex"
           ></switches>
           <div class="list-wrapper">
+            <!-- 最近播放列表 -->
             <scroll
               v-if="currentIndex===0"
               class="list-scroll"
@@ -32,6 +33,7 @@
                 </song-list>
               </div>
             </scroll>
+            <!-- 搜索历史列表 -->
             <scroll
               v-if="currentIndex===1"
               class="list-scroll"
@@ -48,8 +50,14 @@
           </div>
         </div>
         <div class="search-result" v-show="query">
-          <suggest :query='query' :show-singer='false'></suggest>
+          <suggest :query='query' :show-singer='false' @select-song="selectSongBySuggest"></suggest>
         </div>
+        <!-- <message ref="messageRef">
+          <div class="message-title">
+            <i class="icon-ok"></i>
+            <span class="text">1首歌曲已经添加到播放列表</span>
+          </div>
+        </message> -->
       </div>
     </transition>
   </teleport>
@@ -64,6 +72,7 @@ import SongList from '@/components/base/song-list/song-list'
 import SearchList from '@/components/base/search-list/search-list'
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
+import useSearchHistory from '@/components/search/use-search-history'
 export default {
   name: 'add-song',
   components: {
@@ -79,11 +88,13 @@ export default {
     const visible = ref(false)
     const currentIndex = ref(0)
     const scrollRef = ref(null)
+    const messageRef = ref(null)
 
     const store = useStore()
     const searchHistory = computed(() => store.state.searchHistory)
     const playHistory = computed(() => store.state.playHistory)
 
+    const { saveSearch } = useSearchHistory()
     function show() {
       visible.value = true
     }
@@ -93,8 +104,19 @@ export default {
     function addQuery(s) {
       query.value = s
     }
-    function selectSongBySongList() {
-
+    function selectSongBySongList({ song }) {
+      addSong(song)
+    }
+    function selectSongBySuggest(song) {
+      addSong(song)
+      saveSearch(query.value)
+    }
+    function addSong(song) {
+      store.dispatch('addSong', song)
+      showMessage()
+    }
+    function showMessage() {
+      messageRef.value.show()
     }
     return {
       query,
@@ -106,7 +128,8 @@ export default {
       addQuery,
       searchHistory,
       playHistory,
-      selectSongBySongList
+      selectSongBySongList,
+      selectSongBySuggest
     }
   }
 }

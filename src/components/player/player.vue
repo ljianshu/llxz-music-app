@@ -89,6 +89,7 @@ import { useStore } from 'vuex'
 import useMode from './use-mode'
 import useCd from './use-cd'
 import useLyric from './use-lyric'
+import usePlayHistory from './use-play-history'
 import useMiddleInteractive from './use-middle-interactive.js'
 import useAnimation from './use-animation'
 import useFavorite from './use-favorite'
@@ -131,6 +132,7 @@ export default {
 } = useLyric({ songReady, currentTime })
    const { currentShow, middleLStyle, middleRStyle, onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd } = useMiddleInteractive()
     const { cdWrapperRef, enter, afterEnter, leave, afterLeave } = useAnimation()
+    const { savePlay } = usePlayHistory()
 
     // computed
     const disableCls = computed(() => {
@@ -267,6 +269,7 @@ export default {
       songReady.value = true
       // 触发歌词实时跟随，这样保证歌曲和歌词同步
       playLyric()
+      savePlay(currentSong.value) // 存一份数据到本地和vuex,这样就有“最近播放”记录
     }
     function error() {
       songReady.value = true
@@ -322,7 +325,8 @@ export default {
       enter,
       afterEnter,
       leave,
-      afterLeave
+      afterLeave,
+      savePlay
     }
   }
 }
