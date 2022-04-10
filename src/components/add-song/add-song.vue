@@ -52,25 +52,26 @@
         <div class="search-result" v-show="query">
           <suggest :query='query' :show-singer='false' @select-song="selectSongBySuggest"></suggest>
         </div>
-        <!-- <message ref="messageRef">
+        <message ref="messageRef">
           <div class="message-title">
             <i class="icon-ok"></i>
             <span class="text">1首歌曲已经添加到播放列表</span>
           </div>
-        </message> -->
+        </message>
       </div>
     </transition>
   </teleport>
 </template>
 
 <script>
+import Message from '@/components/base/message/message'
 import SearchInput from '@/components/search/search-input'
 import Suggest from '@/components/search/suggest'
 import Switches from '@/components/base/switches/switches'
 import Scroll from '@/components/base/scroll/scroll'
 import SongList from '@/components/base/song-list/song-list'
 import SearchList from '@/components/base/search-list/search-list'
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import useSearchHistory from '@/components/search/use-search-history'
 export default {
@@ -81,7 +82,8 @@ export default {
     Switches,
     Scroll,
     SongList,
-    SearchList
+    SearchList,
+    Message
   },
   setup() {
     const query = ref('')
@@ -95,8 +97,17 @@ export default {
     const playHistory = computed(() => store.state.playHistory)
 
     const { saveSearch } = useSearchHistory()
-    function show() {
+
+    watch(query, async() => {
+      // 查询歌曲时，列表不能滚动
+      await nextTick()
+      refreshScroll()
+    })
+    async function show() {
       visible.value = true
+      // 一进入最近播放，列表就不能滚动
+      await nextTick()
+      refreshScroll()
     }
     function hide() {
       visible.value = false
@@ -118,6 +129,9 @@ export default {
     function showMessage() {
       messageRef.value.show()
     }
+    function refreshScroll() {
+      scrollRef.value.scroll.refresh()
+    }
     return {
       query,
       visible,
@@ -125,6 +139,7 @@ export default {
       hide,
       currentIndex,
       scrollRef,
+      messageRef,
       addQuery,
       searchHistory,
       playHistory,
