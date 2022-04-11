@@ -6,6 +6,7 @@ const Album = () => import('@/views/album'/* webpackChunkName: "album" */)
 const Search = () => import('@/views/search'/* webpackChunkName: "search" */)
 const TopList = () => import('@/views/top-list'/* webpackChunkName: "top-list" */)
 const TopDetail = () => import('@/views/top-detail'/* webpackChunkName: "top-detail" */)
+const UserCenter = () => import('@/views/user-center'/* webpackChunkName: "user-center" */)
 
 const routes = [
   {
@@ -57,6 +58,12 @@ const routes = [
         component: TopDetail
       }
     ]
+  },
+  {
+    path: '/user',
+    components: {
+      user: UserCenter
+    }
   }
 ]
 

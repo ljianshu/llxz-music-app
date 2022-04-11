@@ -2,7 +2,23 @@
   <div id="app">
     <m-header></m-header>
     <Tab></Tab>
-    <router-view :style="viewStyle"/>
+    <router-view :style="viewStyle" v-slot="{ Component }">
+      <keep-alive>
+        <component :is="Component"/>
+      </keep-alive>
+    </router-view>
+    <!-- 为了避免每个一级路由切换都有动画，故而将这个user一级路由独立出来 -->
+    <router-view
+    :style="viewStyle"
+    name="user"
+    v-slot="{ Component }"
+    >
+      <transition appear name="slide">
+        <keep-alive>
+          <component :is="Component"/>
+        </keep-alive>
+      </transition>
+    </router-view>
     <player></player>
   </div>
 </template>
