@@ -3,6 +3,7 @@
     <m-header></m-header>
     <Tab></Tab>
     <router-view :style="viewStyle" v-slot="{ Component }">
+      <!-- 组件缓存 使用keep-alive会让onUnmouted钩子方法就会失效，记得改下-->
       <keep-alive>
         <component :is="Component"/>
       </keep-alive>
