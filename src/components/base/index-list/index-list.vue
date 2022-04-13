@@ -1,7 +1,7 @@
 <template>
   <Scroll class="index-list" :probe-type="3" @scroll="onScroll">
     <ul ref="groupRef">
-      <li v-for="group in singers" :key="group.title" class="group">
+      <li v-for="group in data" :key="group.title" class="group">
         <h2 class="title">{{group.title}}</h2>
         <ul>
           <li v-for="item in group.list" :key="item.id" class="item" @click="onItemClick(item)">
@@ -12,9 +12,9 @@
       </li>
     </ul>
     <!-- 固定层 -->
-    <!-- <div class="fixed" v-show="fixedTitle" :style="fixedTitle">
+    <div class="fixed" v-show="fixedTitle" :style="fixedTitle">
       <div class="fixed-title">{{fixedTitle}}</div>
-    </div> -->
+    </div>
   </Scroll>
 </template>
 <script>
@@ -25,7 +25,7 @@ export default {
   components: { Scroll },
   emit: ['select'],
   props: {
-    singers: {
+    data: {
       type: Array,
       default: () => []
     }
