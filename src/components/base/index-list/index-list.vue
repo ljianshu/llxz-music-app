@@ -12,7 +12,7 @@
       </li>
     </ul>
     <!-- 固定层 -->
-    <div class="fixed" v-show="fixedTitle" :style="fixedTitle">
+    <div class="fixed" v-show="fixedTitle" :style="fixedStyle">
       <div class="fixed-title">{{fixedTitle}}</div>
     </div>
   </Scroll>
@@ -34,11 +34,13 @@ export default {
     const onItemClick = (item) => {
       emit('select', item)
     }
-    const { groupRef, onScroll } = useFixed(props)
+    const { groupRef, onScroll, fixedTitle, fixedStyle } = useFixed(props)
     return {
       groupRef,
       onScroll,
-      onItemClick
+      onItemClick,
+      fixedTitle,
+      fixedStyle
     }
   }
 }
